@@ -1,0 +1,8 @@
+{
+	"server":"irc.awfulnet.org",
+	"port":6667,
+	"nick":"toBN",
+	"user":"Nisani",
+	"channels":["#bots","#nbot","#mafia"],
+	"autorejoin":true
+}

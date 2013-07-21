@@ -1,0 +1,28 @@
+register
+http://imgur.com/a/ByFoT
+userguide gyude ircguide
+http://bit.ly/ircguide
+notice
+If you can't see messages from the bot, check your server status window.
+war
+Are we talking about OS's again?
+war2
+Are we talking about IRC clients again?
+what
+"What?" They speak English in What?
+when
+When it's ready.
+enforce
+To stop your nick being changed to IForgotToIdentify, type /msg nickserv set enforce off
+identify
+Identify with /identify yourpassword
+forgot
+Type /identify yournick yourpass and then change your nick back with /nick yournick
+newpass changepass
+Change your password with /msg nickserv set password newpasswordhere
+sendpass
+If you forgot your password and want to reset it, do /msg nickserv sendpass yournick
+release
+If your nick is locked, use /msg nickserv release nick password
+source
+My source code is on Github! https://github.com/Sinani201/NBot
