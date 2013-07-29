@@ -17,7 +17,7 @@ class Factoids extends Actor with CommandDelegator[String,String] {
     case Privmsg(nick, target, msg) if msg(0) == '!' =>
       val toSend = if (target(0) == '#' | target(0) == '&') target else nick
       runCmd(msg.substring(1)) foreach {
-        sender ! s"PRIVMSG $target :"+_
+        sender ! s"PRIVMSG $toSend :"+_
       }
 
     case _ =>
