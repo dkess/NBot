@@ -23,7 +23,6 @@ class IRCClient(configFilename:String) extends Actor {
     }
 
   IO(Tcp) ! Connect(new InetSocketAddress(config("server").toString, config("port").asInstanceOf[Double].toInt))
-  //IO(Tcp) ! Connect(remote)
 
   // The socket connection
   var connection:ActorRef = null
@@ -33,8 +32,6 @@ class IRCClient(configFilename:String) extends Actor {
 
   var plugins = List(
      context.actorOf(Props(classOf[ConfigFile], config, configFilename), name = "config")
-     //context.actorOf(Props(new ConfigFile(config, configFilename)), name = "config")
-    //,context.actorOf(Props(new Channeljoin(nick)), name = "channeljoin") ,context.actorOf(Props[Factoids], name = "factoids")
     ,context.actorOf(Props(classOf[Channeljoin], nick), name = "channeljoin")
     ,context.actorOf(Props[Factoids], name = "factoids")
     ,context.actorOf(Props[Nicklist], name= "nicklist")
@@ -44,10 +41,6 @@ class IRCClient(configFilename:String) extends Actor {
     ,context.actorOf(Props[Tell], name = "tell")
   )
 
-  // for some reason I have to send the USER message
-  // after the first ping
-  var pings = false
-
   def receive = {
     case CommandFailed(_: Connect) =>
       context stop self
@@ -56,10 +49,11 @@ class IRCClient(configFilename:String) extends Actor {
       //listener ! c
       connection = sender
       connection ! Register(self)
-      self ! "NICK "+nick
-      self ! "USER "+user+" 0 * : "+user
-      //self ! "USER "+user+" 0 * : "+user
-
+      // these have to be sent in the same message
+      // or the client wont conect
+      // flushing problem?
+      self ! s"NICK $nick\r\nUSER $user 0 * :$user"
+      
     case data:String =>
       println("-> "+data)
       connection ! Write(ByteString(data+"\r\n"))
@@ -72,10 +66,6 @@ class IRCClient(configFilename:String) extends Actor {
       dataStr.split("\n").map(_.stripSuffix("\r")) foreach {
         case Ping(response) =>
           self ! "PONG :"+response
-          if (pings == false) {
-            pings = true
-            self ! "USER "+user+" 0 * : "+user
-          }
         case msg =>
           //plugins.foreach((p:ActorRef) => p ! msg)
           context.children.foreach((p:ActorRef) => p ! msg)

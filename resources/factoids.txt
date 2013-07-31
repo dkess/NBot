@@ -1,6 +1,6 @@
 register
 http://imgur.com/a/ByFoT
-userguide gyude ircguide
+userguide guide ircguide
 http://bit.ly/ircguide
 notice
 If you can't see messages from the bot, check your server status window.
