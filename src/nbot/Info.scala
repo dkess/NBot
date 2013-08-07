@@ -85,23 +85,25 @@ class Info extends Actor {
       }
 
     case Privmsg(nick, chan, msg) if msg(0) == '!' | msg(0) == '@' =>
-      val isPublic = msg(0) == '@'
-      val smsg = msg.split(" ")
-      val category = smsg(0).substring(1)
-      val targetNick = smsg(1).toLowerCase
+      msg.substring(1).split(" ",3) match {
+        case Array(category, targetNick, _@_*) =>
+          val tNick = targetNick.toLowerCase
 
-      Class.forName("org.sqlite.JDBC")
+          Class.forName("org.sqlite.JDBC")
 
-      Database.forURL("jdbc:sqlite:resources/info.db", driver = "scala.slick.driver.SQLiteDriver") withSession {
-        // check if the user has an alias
-        val aliascheck = for (a <- Info if a.nick === targetNick && a.infotype === "alias") yield a.info
-        // put the result of the alias check in an Option, and if it fails, use the entry for the given nick
-        val nickToUse = aliascheck.firstOption.getOrElse(targetNick).toLowerCase
-        val results = for(i <- Info if i.nick === nickToUse && i.infotype === category) yield i.info
+          Database.forURL("jdbc:sqlite:resources/info.db", driver = "scala.slick.driver.SQLiteDriver") withSession {
+            // check if the user has an alias
+            val aliascheck = for (a <- Info if a.nick === tNick && a.infotype === "alias") yield a.info
+            // put the result of the alias check in an Option, and if it fails, use the entry for the given nick
+            val nickToUse = aliascheck.firstOption.getOrElse(targetNick).toLowerCase
+            val results = for(i <- Info if i.nick === nickToUse && i.infotype === category) yield i.info
 
-        results foreach {
-          sender ! (if(isPublic) s"PRIVMSG $chan :" else s"NOTICE $nick :") + _
-        }
+            results foreach {
+              sender ! (if(msg(0) == '@') s"PRIVMSG $chan :" else s"NOTICE $nick :") + _
+            }
+          }
+
+        case _ => {}
       }
 
     case _ => {}
