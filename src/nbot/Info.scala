@@ -33,7 +33,7 @@ class Info extends Actor {
       // only take strings, and convert to a set
       allowedInfo = (rawList collect {case s:String=>s}).toSet
 
-    case Privmsg(nick, _, msg) if msg.startsWith("!add ") =>
+    case Privmsg(nick, _, msg) if msg.startsWith("!addfield ") =>
       msg.split(" ",3) match {
         case Array(_, category, rest @ _ *) =>
           // An empty string marks the info field for deletion
