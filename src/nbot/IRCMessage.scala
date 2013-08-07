@@ -28,6 +28,15 @@ object Privmsg extends IRCMessage {
   }
 }
 
+case class Notice(nick:String, target:String, msg:String)
+object Notice extends IRCMessage {
+  def unapply(str: Any) = str match {
+    case r"^:([^! ]+)$nick(?:!.*)? NOTICE (.+)$target :(.*)$msg$$" =>
+      Some(nick, target, msg)
+    case _ => None
+  }
+}
+
 case class Part(nick:String, target:String, msg:Option[String])
 object Part extends IRCMessage {
   def unapply(str: Any) = str match {

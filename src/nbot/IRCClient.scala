@@ -39,6 +39,7 @@ class IRCClient(configFilename:String) extends Actor {
     ,context.actorOf(Props[Mfk], name = "mfk")
     ,context.actorOf(Props[Callops], name = "callops")
     ,context.actorOf(Props[Tell], name = "tell")
+    ,context.actorOf(Props[Info], name = "info")
   )
 
   def receive = {

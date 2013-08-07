@@ -4,5 +4,6 @@
 	"nick":"toBN",
 	"user":"Nisani",
 	"channels":["#bots","#nbot","#mafia"],
-	"autorejoin":true
+	"autorejoin":true,
+	"allowedinfo":["lastfm", "card"]
 }

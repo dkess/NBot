@@ -11,7 +11,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-agent" % "2.2-M3",
   "com.typesafe.akka" %% "akka-testkit" % "2.2-M3",
   "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
-  "commons-lang" % "commons-lang" % "2.6"
+  "commons-lang" % "commons-lang" % "2.6",
+  "com.typesafe.slick" %% "slick" % "1.0.1",
+  "org.xerial" % "sqlite-jdbc" % "3.6.16"
 )
   //"junit" % "junit" % "4.11" % "test",
   //"com.novocode" % "junit-interface" % "0.7" % "test->default"
