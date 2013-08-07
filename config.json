@@ -5,5 +5,5 @@
 	"user":"Nisani",
 	"channels":["#bots","#nbot","#mafia"],
 	"autorejoin":true,
-	"allowedinfo":["lastfm", "card"]
+	"allowedinfo":["alias","lastfm", "card"]
 }

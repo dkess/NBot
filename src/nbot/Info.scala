@@ -52,8 +52,14 @@ class Info extends Actor {
               Class.forName("org.sqlite.JDBC")
 
               Database.forURL("jdbc:sqlite:resources/info.db",driver="scala.slick.driver.SQLiteDriver") withSession {
+                // modify the real entry if this user is updating from an alias
+                // check if the user has an alias
+                val aliascheck = for (a <- Info if a.nick === nick.toLowerCase && a.infotype === "alias") yield a.info
+                // put the result of the alias check in an Option, and if it fails, use the entry for the given nick
+                val nickToUse = aliascheck.firstOption.getOrElse(nick).toLowerCase
+
                 (Q.u + "replace into info (nick, infotype, info) values ("
-                  +? expected.nick.toLowerCase + "," +? expected.infotype + "," +? expected.info + ")").execute
+                  +? nickToUse + "," +? expected.infotype + "," +? expected.info + ")").execute
               }
               sender ! s"NOTICE ${expected.nick} :Your ${expected.infotype} has been updated successfully."
             } else {
@@ -75,7 +81,11 @@ class Info extends Actor {
       Class.forName("org.sqlite.JDBC")
 
       Database.forURL("jdbc:sqlite:resources/info.db", driver = "scala.slick.driver.SQLiteDriver") withSession {
-        val results = for(i <- Info if i.nick === targetNick && i.infotype === category) yield i.info
+        // check if the user has an alias
+        val aliascheck = for (a <- Info if a.nick === targetNick && a.infotype === "alias") yield a.info
+        // put the result of the alias check in an Option, and if it fails, use the entry for the given nick
+        val nickToUse = aliascheck.firstOption.getOrElse(targetNick).toLowerCase
+        val results = for(i <- Info if i.nick === nickToUse && i.infotype === category) yield i.info
 
         results foreach {
           sender ! (if(isPublic) s"PRIVMSG $chan :" else s"NOTICE $nick :") + _
