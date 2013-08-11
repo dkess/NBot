@@ -36,10 +36,12 @@ class Info extends Actor {
     case Privmsg(nick, _, msg) if msg.startsWith("!addfield ") =>
       msg.split(" ",3) match {
         case Array(_, category, rest @ _ *) =>
-          // An empty string marks the info field for deletion
-          val newinfo = rest.headOption.getOrElse("")
-          sender ! "PRIVMSG NickServ :ACC "+nick
-          nickCheckQueue = nickCheckQueue.enqueue(Info(nick, category, newinfo))
+          if (allowedInfo(category)) {
+            // An empty string marks the info field for deletion
+            val newinfo = rest.headOption.getOrElse("")
+            sender ! "PRIVMSG NickServ :ACC "+nick
+            nickCheckQueue = nickCheckQueue.enqueue(Info(nick, category, newinfo))
+          }
 
         case _ => {}
       }
