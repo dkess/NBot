@@ -25,6 +25,8 @@ Make a new class that extends akka.Actor. Messages from the server are sent as r
 To add this plugin, spawn the actor from IRCClient. All children of IRCClient receive messages from the server.
 
 ### Reading from the config file
+To reload the config file while the bot is running, send a PRIVMSG in any channel that the bot can see (or privately) with "reload-config" without quotes.
+
 To get updates for a key for each config reload, send a `SubscribeToKey(key:String)` message to the `config` actor. Every time the key is changed, a `KeyUpdate(key:String, value:Any)` message will be sent back to that actor.
 
 ### Nicklist and Factoid Handlers
