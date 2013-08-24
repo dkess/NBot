@@ -38,7 +38,7 @@ class Mfk extends Actor {
       val ircclient = sender
       ask(context.actorFor("../nicklist"),FetchResults(target, msg.substring(4).trim))(5 seconds) onSuccess {
         case x:Set[String] =>
-          ircclient ! s"PRIVMSG $target :MFK: "+takeRand(3, x.toSeq).map(strInsert(_,"_",1)).mkString(" ")
+          ircclient ! s"PRIVMSG $target :MFK: "+takeRand(3, x.toSeq).map(strInsert(_,"'",1)).mkString(" ")
         case _ => {}
       }
 
