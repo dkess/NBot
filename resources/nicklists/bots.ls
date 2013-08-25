@@ -1,10 +1,10 @@
-nbot
+^nbot
 alexander
 hintssbot
-mag
+^mag
 infobot
 beardbot
-gil
+^gil
 mrboon
 sigmund
 JeffTheFish
@@ -16,10 +16,10 @@ sadaharu
 chanserv
 gameserv
 heimdal
-me
+^me(\|.*)?
 simbot
 qbot
 codebrad
-timebot
 gaybot
 ombot
+timebot
