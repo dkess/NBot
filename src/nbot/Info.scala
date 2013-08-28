@@ -101,7 +101,7 @@ class Info extends Actor {
             val results = for(i <- Info if i.nick === nickToUse && i.infotype === category) yield i.info
 
             results foreach {
-              sender ! (if(msg(0) == '@') s"PRIVMSG $chan :" else s"NOTICE $nick :") + _
+              sender ! (if(msg(0) == '@') s"PRIVMSG $chan :" else s"NOTICE $nick :") + s"$nickToUse's $category: "+_
             }
           }
 
