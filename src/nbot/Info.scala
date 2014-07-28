@@ -24,14 +24,51 @@ class Info extends Actor {
 
   var allowedInfo = Set[String]()
   var nickCheckQueue = Queue[Info]()
+  var use_status = false
 
-  override def preStart =
+  override def preStart = {
     context.actorSelection("../config").tell(SubscribeToKey("allowedinfo"), self)
+    context.actorSelection("../config").tell(SubscribeToKey("use_status"), self)
+  }
+
+  def update_info(nick:String, expected:Info, digit:String) = {
+    nickCheckQueue = nickCheckQueue.tail
+    if (digit.equals("3") | digit.equals("2")) {
+      Class.forName("org.sqlite.JDBC")
+
+      Database.forURL("jdbc:sqlite:resources/info.db",driver="scala.slick.driver.SQLiteDriver") withSession {
+        val nickToUse = if (expected.infotype.equals("alias")) {
+          // if the user wants to chage their alias, it shouldn't redirect
+          nick.toLowerCase
+        } else {
+          // modify the real entry if this user is updating from an alias
+          // check if the user has an alias
+          val aliascheck = for (a <- Info if a.nick === nick.toLowerCase && a.infotype === "alias") yield a.info
+          // put the result of the alias check in an Option, and if it fails, use the entry for the given nick
+          aliascheck.firstOption.getOrElse(nick).toLowerCase
+        }
+
+        if (expected.info.equals("")) {
+          Query(Info).filter(i=>i.nick === nick.toLowerCase && i.infotype === expected.infotype).delete
+          sender ! s"NOTICE $nick :Your ${expected.infotype} has been deleted successfully."
+        } else {
+          (Q.u + "REPLACE INTO info (nick, infotype, info) values ("
+            +? nickToUse + "," +? expected.infotype + "," +? expected.info + ")").execute
+          sender ! s"NOTICE $nick :Your ${expected.infotype} has been updated successfully."
+        }
+      }
+    } else {
+      sender ! s"NOTICE ${expected.nick} :You must be identified to do that!"
+    }
+  }
 
   def receive = {
     case KeyUpdate("allowedinfo", rawList:Seq[Any]) =>
       // only take strings, and convert to a set
       allowedInfo = (rawList collect {case s:String=>s}).toSet
+
+    case KeyUpdate("use_status", us:Boolean) =>
+        use_status = us
 
     case Privmsg(nick, _, msg) if msg.startsWith("!addfield ") =>
       msg.split(" ",3) match {
@@ -39,7 +76,8 @@ class Info extends Actor {
           if (allowedInfo(category)) {
             // An empty string marks the info field for deletion
             val newinfo = rest.headOption.getOrElse("")
-            sender ! "PRIVMSG NickServ :ACC "+nick
+            val nscommand = if (use_status) "STATUS" else "ACC"
+            sender ! "PRIVMSG NickServ :"+nscommand+" "+nick
             nickCheckQueue = nickCheckQueue.enqueue(Info(nick, category, newinfo))
           }
 
@@ -51,34 +89,10 @@ class Info extends Actor {
         val expected = nickCheckQueue.front
         msg.split(" ",4).take(3) match {
           case Array(nick, "ACC", digit) if nick.toLowerCase.equals(expected.nick.toLowerCase) =>
-            nickCheckQueue = nickCheckQueue.tail
-            if (digit.equals("3") | digit.equals("2")) {
-              Class.forName("org.sqlite.JDBC")
+              update_info(nick, expected, digit)
 
-              Database.forURL("jdbc:sqlite:resources/info.db",driver="scala.slick.driver.SQLiteDriver") withSession {
-                val nickToUse = if (expected.infotype.equals("alias")) {
-                  // if the user wants to chage their alias, it shouldn't redirect
-                  nick.toLowerCase
-                } else {
-                  // modify the real entry if this user is updating from an alias
-                  // check if the user has an alias
-                  val aliascheck = for (a <- Info if a.nick === nick.toLowerCase && a.infotype === "alias") yield a.info
-                  // put the result of the alias check in an Option, and if it fails, use the entry for the given nick
-                  aliascheck.firstOption.getOrElse(nick).toLowerCase
-                }
-
-                if (expected.info.equals("")) {
-                  Query(Info).filter(i=>i.nick === nick.toLowerCase && i.infotype === expected.infotype).delete
-                  sender ! s"NOTICE $nick :Your ${expected.infotype} has been deleted successfully."
-                } else {
-                  (Q.u + "repLACE INTO info (nick, infotype, info) values ("
-                    +? nickToUse + "," +? expected.infotype + "," +? expected.info + ")").execute
-                  sender ! s"NOTICE $nick :Your ${expected.infotype} has been updated successfully."
-                }
-              }
-            } else {
-              sender ! s"NOTICE ${expected.nick} :You must be identified to do that!"
-            }
+          case Array("STATUS", nick, digit) if nick.toLowerCase.equals(expected.nick.toLowerCase) =>
+              update_info(nick, expected, digit)
 
           case _ => {}
         }

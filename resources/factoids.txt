@@ -1,7 +1,3 @@
-register
-http://imgur.com/a/ByFoT
-userguide guide ircguide
-http://bit.ly/ircguide
 notice
 If you can't see messages from the bot, check your server status window.
 war
@@ -26,3 +22,9 @@ release
 If your nick is locked, use /msg nickserv release nick password
 source
 My source code is on Github! https://github.com/Sinani201/NBot
+test
+Testing 123
+ping
+pong
+pong
+ping
