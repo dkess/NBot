@@ -85,7 +85,7 @@ object Nick extends IRCMessage {
 case class Names(channel:String, names:Seq[(Option[Char],String)])
 object Names extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:.* 353 .+ . (.+)$chan :(.*)$rawnames" =>
+    case r"^:[^ ]+ 353 [^ ]+ . ([^ ]+)$chan :(.*)$rawnames" =>
       val nl = for (n <- rawnames.split(' '):Seq[String]) yield 
         if (Set('+','~','@','&','%').contains(n(0))) (Some(n(0)),n.substring(1)) else (None,n)
       
