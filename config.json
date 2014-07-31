@@ -1,10 +1,10 @@
 {
-	"server":"irc.rizon.net",
+	"server":"irc.awfulnet.org",
 	"port":6667,
 	"nick":"toBN",
 	"user":"Nisani",
 	"channels":["#nbot"],
 	"autorejoin":true,
-	"allowedinfo":["alias","lastfm", "card", "info"],
-	"use_status":true
+	"allowedinfo":["alias","lastfm", "card", "inf"],
+	"use_status":false
 }

@@ -22,7 +22,7 @@ object Ping extends IRCMessage {
 case class Privmsg(nick:String, target:String, msg:String)
 object Privmsg extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$nick(?:!.*)? PRIVMSG (.+)$target :(.*)$msg$$" =>
+    case r"^:([^! ]+)$nick(?:![^ ]+)? PRIVMSG ([^ ]+)$target :(.*)$msg$$" =>
       Some(nick, target, msg)
     case _ => None
   }
@@ -31,7 +31,7 @@ object Privmsg extends IRCMessage {
 case class Notice(nick:String, target:String, msg:String)
 object Notice extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$nick(?:!.*)? NOTICE (.+)$target :(.*)$msg$$" =>
+    case r"^:([^! ]+)$nick(?:![^ ]+)? NOTICE ([^ ]+)$target :(.*)$msg$$" =>
       Some(nick, target, msg)
     case _ => None
   }
@@ -40,7 +40,7 @@ object Notice extends IRCMessage {
 case class Part(nick:String, target:String, msg:Option[String])
 object Part extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$nick(?:!.*)? PART (.*?)$target( :.*)?$msg$$" =>
+    case r"^:([^! ]+)$nick(?:![^ ]+)? PART ([^ ]+?)$target( :.*)?$msg$$" =>
       Some(nick, target, Option(msg))
     case _ => None
   }
@@ -49,7 +49,7 @@ object Part extends IRCMessage {
 case class Join(nick:String, channel:String)
 object Join extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$nick(?:!.*)? JOIN :(.+)$chan$$" =>
+    case r"^:([^! ]+)$nick(?:!.[^ ]+)? JOIN :(.+)$chan$$" =>
       Some(nick, chan)
     case _ => None
   }
@@ -58,7 +58,7 @@ object Join extends IRCMessage {
 case class Quit(nick:String, msg:String)
 object Quit extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$nick(?:!.*)? QUIT :(.+)$msg$$" =>
+    case r"^:([^! ]+)$nick(?:![^ ]+)? QUIT :(.+)$msg$$" =>
       Some(nick, msg)
     case _ => None
   }
@@ -67,7 +67,7 @@ object Quit extends IRCMessage {
 case class Kick(kicker:String, channel:String, kickee:String, msg:String)
 object Kick extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$nick(?:!.*)? KICK (.+)$chan (.+)$kickee :(.*)$msg$$" =>
+    case r"^:([^! ]+)$nick(?:![^ ]+)? KICK ([^ ]+)$chan ([^ ]+)$kickee :(.*)$msg$$" =>
       Some(nick, chan, kickee, msg)
     case _ => None
   }
@@ -76,7 +76,7 @@ object Kick extends IRCMessage {
 case class Nick(oldnick:String, newnick:String)
 object Nick extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$oldnick(?:!.*)? NICK :(.+)$newnick$$" =>
+    case r"^:([^! ]+)$oldnick(?:![^ ]+)? NICK :(.+)$newnick$$" =>
       Some(oldnick, newnick)
     case _ => None
   }
@@ -106,7 +106,7 @@ object EndNames extends IRCMessage {
 case class Invite(nick:String, channel:String)
 object Invite extends IRCMessage {
   def unapply(str: Any) = str match {
-    case r"^:([^! ]+)$nick(?:!.*)? INVITE .+ :(.+)$chan$$" =>
+    case r"^:([^! ]+)$nick(?:![^ ]+)? INVITE [^ ]+ :(.+)$chan$$" =>
       Some(nick, chan)
     case _ => None
   }
@@ -143,7 +143,7 @@ object SortedMode extends IRCMessage {
 case class Mode(nick:String, channel:String, added:IndexedSeq[Char], removed:IndexedSeq[Char], args:IndexedSeq[String])
 object Mode extends IRCMessage {
   def unapply(str:Any) = str match {
-    case r"""^:([^! ]+)$nick(?:!.*)? MODE ([^ ]+)$chan (\+[^ ]+)?$add(-[^ ]+)?$sub(.*)$args$$""" =>
+    case r"""^:([^! ]+)$nick(?:![^ ]+)? MODE ([^ ]+)$chan (\+[^ ]+)?$add(-[^ ]+)?$sub(.*)$args$$""" =>
       val trimmed = args.trim
       Some(nick, chan,
         Option(add).map(_.substring(1).toIndexedSeq).getOrElse(IndexedSeq()),
